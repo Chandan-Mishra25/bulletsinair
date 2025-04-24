@@ -5,6 +5,20 @@ const ctx = canvas.getContext('2d');
 let isGameOver = false;
 let isPaused = false;
 
+// Touch states
+const touchStates = {
+    player1: {
+        up: false,
+        down: false,
+        shoot: false
+    },
+    player2: {
+        up: false,
+        down: false,
+        shoot: false
+    }
+};
+
 // Initial player setup function
 function initializePlayers() {
     return {
@@ -122,6 +136,118 @@ function checkCollision(rect1, rect2) {
            rect1.y + rect1.height > rect2.y;
 }
 
+// Initialize mobile controls
+function initializeMobileControls() {
+    const controlsContainer = document.createElement('div');
+    controlsContainer.className = 'mobile-controls';
+    
+    // Player 1 controls
+    const player1Up = createControlButton('player1-up', '↑');
+    const player1Down = createControlButton('player1-down', '↓');
+    const player1Shoot = createControlButton('player1-shoot', '⚡');
+    
+    // Player 2 controls
+    const player2Up = createControlButton('player2-up', '↑');
+    const player2Down = createControlButton('player2-down', '↓');
+    const player2Shoot = createControlButton('player2-shoot', '⚡');
+    
+    controlsContainer.appendChild(player1Up);
+    controlsContainer.appendChild(player1Down);
+    controlsContainer.appendChild(player1Shoot);
+    controlsContainer.appendChild(player2Up);
+    controlsContainer.appendChild(player2Down);
+    controlsContainer.appendChild(player2Shoot);
+    
+    document.body.appendChild(controlsContainer);
+}
+
+function createControlButton(className, text) {
+    const button = document.createElement('div');
+    button.className = `control-button ${className}`;
+    button.textContent = text;
+    
+    // Add touch event listeners
+    button.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        handleTouchStart(className);
+    });
+    
+    button.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        handleTouchEnd(className);
+    });
+    
+    return button;
+}
+
+function handleTouchStart(className) {
+    if (isPaused || isGameOver) return;
+    
+    switch(className) {
+        case 'player1-up':
+            touchStates.player1.up = true;
+            break;
+        case 'player1-down':
+            touchStates.player1.down = true;
+            break;
+        case 'player1-shoot':
+            touchStates.player1.shoot = true;
+            shootBullet(player1);
+            break;
+        case 'player2-up':
+            touchStates.player2.up = true;
+            break;
+        case 'player2-down':
+            touchStates.player2.down = true;
+            break;
+        case 'player2-shoot':
+            touchStates.player2.shoot = true;
+            shootBullet(player2);
+            break;
+    }
+}
+
+function handleTouchEnd(className) {
+    switch(className) {
+        case 'player1-up':
+            touchStates.player1.up = false;
+            break;
+        case 'player1-down':
+            touchStates.player1.down = false;
+            break;
+        case 'player1-shoot':
+            touchStates.player1.shoot = false;
+            break;
+        case 'player2-up':
+            touchStates.player2.up = false;
+            break;
+        case 'player2-down':
+            touchStates.player2.down = false;
+            break;
+        case 'player2-shoot':
+            touchStates.player2.shoot = false;
+            break;
+    }
+}
+
+function shootBullet(player) {
+    if (player === player1) {
+        player1.bullets.push({
+            x: player1.x + player1.width,
+            y: player1.y + player1.height/2,
+            size: bulletSize,
+            direction: 1
+        });
+    } else {
+        player2.bullets.push({
+            x: player2.x,
+            y: player2.y + player2.height/2,
+            size: bulletSize,
+            direction: -1
+        });
+    }
+}
+
 // Game loop
 function gameLoop() {
     if (isPaused || isGameOver) return;
@@ -129,11 +255,11 @@ function gameLoop() {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Move players vertically
-    if (keys.w && player1.y > 0) player1.y -= player1.speed;
-    if (keys.s && player1.y < canvas.height - player1.height) player1.y += player1.speed;
-    if (keys.ArrowUp && player2.y > 0) player2.y -= player2.speed;
-    if (keys.ArrowDown && player2.y < canvas.height - player2.height) player2.y += player2.speed;
+    // Move players vertically (including touch controls)
+    if ((keys.w || touchStates.player1.up) && player1.y > 0) player1.y -= player1.speed;
+    if ((keys.s || touchStates.player1.down) && player1.y < canvas.height - player1.height) player1.y += player1.speed;
+    if ((keys.ArrowUp || touchStates.player2.up) && player2.y > 0) player2.y -= player2.speed;
+    if ((keys.ArrowDown || touchStates.player2.down) && player2.y < canvas.height - player2.height) player2.y += player2.speed;
 
     // Update and draw bullets
     // Player 1 bullets
@@ -239,6 +365,9 @@ function gameLoop() {
 
     requestAnimationFrame(gameLoop);
 }
+
+// Initialize mobile controls when the game starts
+initializeMobileControls();
 
 // Start the game
 gameLoop();
