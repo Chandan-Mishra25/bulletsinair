@@ -1,0 +1,71 @@
+.mobile-controls {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 100;
+}
+
+.control-button {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: auto;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.control-button:active {
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.player1-up {
+    bottom: 150px;
+    left: 50px;
+}
+
+.player1-down {
+    bottom: 50px;
+    left: 50px;
+}
+
+.player1-shoot {
+    bottom: 100px;
+    left: 120px;
+}
+
+.player2-up {
+    bottom: 150px;
+    right: 50px;
+}
+
+.player2-down {
+    bottom: 50px;
+    right: 50px;
+}
+
+.player2-shoot {
+    bottom: 100px;
+    right: 120px;
+}
+
+@media (max-width: 768px) {
+    .control-button {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .player1-up, .player1-down, .player1-shoot {
+        left: 30px;
+    }
+    
+    .player2-up, .player2-down, .player2-shoot {
+        right: 30px;
+    }
+} 
